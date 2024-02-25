@@ -24,9 +24,11 @@ function App() {
           alt="artwork"
           style={{ width: "100%", height: "100%", objectFit: "contain" }}
         ></img>
-        <Box position={"absolute"} padding={"16px"} right={0} bottom={0} sx={{backgroundColor: "rgba(0,0,0,0.8)"}}>
+        <Box position={"absolute"} padding={"16px"} right={0} bottom={0} sx={{backgroundColor: "rgba(0,0,0,0.8)"}} display={"flex"} flexDirection={"column"} gap={3}>
           <Typography variant="body1">{artwork.prompt}</Typography>
+          <Box textAlign={"right"}>
           <Typography variant="h6">{artwork.artist}</Typography>
+          </Box>
         </Box>
         </>
       )}

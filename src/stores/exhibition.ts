@@ -39,8 +39,9 @@ ws.addEventListener("message", (event) => {
         });
       }
     } else if (data.type === "subscription") {
-      if (data.event === "update") {
-        // useStore.getState().update(data.data);
+      console.log(data);
+      if (data.event === "update" || data.event === "create") {
+        useStore.getState().update(data.data);
       }
     } else {
       console.log("got message", event.data);
@@ -53,7 +54,7 @@ ws.addEventListener("error", (event) => {
 
 interface State {
   artworks: any[];
-  artwork: any| null;
+  artwork: any | null;
   init: () => void;
   tick: () => void;
   update: (data: any) => void;
@@ -70,19 +71,30 @@ const useStore = create<State>()(
             set({ artworks: res?.data?.data });
           });
           setInterval(() => {
-            get().tick()
+            // axios
+            //   .get(`${BASE_URL}/artworks?fields=*.*&limit=-1`)
+            //   .then((res) => {
+            //     set({ artworks: res?.data?.data });
+            //   });
+            get().tick();
           }, 5000);
         },
         tick: () => {
-          const artworks = get().artworks
+          const artworks = get().artworks;
           const artwork = artworks[Math.floor(Math.random() * artworks.length)];
-          if(artwork){
-            set({ artwork })
+          if (artwork) {
+            set({ artwork });
           }
         },
         update: (data: any) => {
+          console.log("updating artsworks", data);
           data.forEach((item: any) => {
-            // devices
+            // artwork
+            if(item?.image){
+              const artworks = [...get().artworks]
+              artworks.push(item);
+              set({ artworks });
+            }
           });
         },
       }),
