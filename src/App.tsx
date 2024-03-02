@@ -19,17 +19,27 @@ function App() {
     >
       {artwork && (
         <>
-        <img
-          src={`${BASE_URL}/${artwork.image.filename_disk}`}
-          alt="artwork"
-          style={{ width: "100%", height: "100%", objectFit: "contain" }}
-        ></img>
-        <Box position={"absolute"} padding={"16px"} right={0} bottom={0} sx={{backgroundColor: "rgba(0,0,0,0.8)"}} display={"flex"} flexDirection={"column"} gap={3}>
-          <Typography variant="body1">{artwork.prompt}</Typography>
-          <Box textAlign={"right"}>
-          <Typography variant="h6">{artwork.artist}</Typography>
+          <img
+            src={`${BASE_URL}/${artwork.image.filename_disk}`}
+            alt="artwork"
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          ></img>
+          <Box
+            position={"absolute"}
+            padding={"16px"}
+            right={0}
+            bottom={0}
+            sx={{ backgroundColor: "rgba(0,0,0,0.8)" }}
+            display={"flex"}
+            flexDirection={"column"}
+            gap={3}
+          >
+            <Typography variant="body1">{artwork.prompt}</Typography>
+            <Box textAlign={"right"}>
+              <Typography variant="h6">{artwork.artist}</Typography>
+              <Typography variant="body2">{artwork.genAI}</Typography>
+            </Box>
           </Box>
-        </Box>
         </>
       )}
     </Box>
