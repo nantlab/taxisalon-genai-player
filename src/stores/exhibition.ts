@@ -55,6 +55,7 @@ interface State {
   artworks: any[];
   artwork: any | null;
   slideTime: number;
+  bannerText: string;
   init: () => void;
   tick: () => void;
   update: (data: any) => void;
@@ -68,6 +69,7 @@ const useStore = create<State>()(
         artworks: [],
         artwork: null,
         slideTime: 30000,
+        bannerText: "",
         init: async () => {
           axios.get(`${BASE_URL}/artworks?fields=*.*&limit=-1`).then((res) => {
             set({ artworks: res?.data?.data });
@@ -75,7 +77,7 @@ const useStore = create<State>()(
           axios.get(`${BASE_URL}/settings?fields=*.*&limit=-1`).then((res) => {
             // set({ artworks: res?.data?.data });
             if (res?.data?.data?.slideTime) {
-              set({ slideTime: parseInt(res?.data?.data?.slideTime) });
+              set({ slideTime: parseInt(res?.data?.data?.slideTime), bannerText: res?.data?.data?.banner_text ?? ""});
             }
           });
           clearInterval(intervalId);
@@ -114,6 +116,9 @@ const useStore = create<State>()(
                 get().tick();
               }, slideTime);
               console.log("updated slide time")
+            }
+            if (item?.banner_text) {
+              set({ bannerText: item.banner_text });
             }
           });
         },
