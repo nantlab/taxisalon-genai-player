@@ -25,7 +25,7 @@ ws.addEventListener("message", (event) => {
       );
     } else if (data.type === "auth") {
       if (data.status === "ok") {
-        const collections = ["artworks"];
+        const collections = ["artworks", "settings"];
         collections.forEach((collection) => {
           ws.send(
             JSON.stringify({
@@ -39,9 +39,8 @@ ws.addEventListener("message", (event) => {
         });
       }
     } else if (data.type === "subscription") {
-      console.log(data);
       if (data.event === "update" || data.event === "create") {
-        useStore.getState().update(data.data);
+        useStore.getState().update(data?.data);
       }
     } else {
       console.log("got message", event.data);
@@ -55,29 +54,39 @@ ws.addEventListener("error", (event) => {
 interface State {
   artworks: any[];
   artwork: any | null;
+  slideTime: number;
   init: () => void;
   tick: () => void;
   update: (data: any) => void;
 }
 
+let intervalId = 0;
 const useStore = create<State>()(
   devtools(
     persist(
       (set, get) => ({
         artworks: [],
         artwork: null,
+        slideTime: 30000,
         init: async () => {
           axios.get(`${BASE_URL}/artworks?fields=*.*&limit=-1`).then((res) => {
             set({ artworks: res?.data?.data });
           });
-          setInterval(() => {
+          axios.get(`${BASE_URL}/settings?fields=*.*&limit=-1`).then((res) => {
+            // set({ artworks: res?.data?.data });
+            if (res?.data?.data?.slideTime) {
+              set({ slideTime: parseInt(res?.data?.data?.slideTime) });
+            }
+          });
+          clearInterval(intervalId);
+          intervalId = setInterval(() => {
             // axios
             //   .get(`${BASE_URL}/artworks?fields=*.*&limit=-1`)
             //   .then((res) => {
             //     set({ artworks: res?.data?.data });
             //   });
             get().tick();
-          }, 5000);
+          }, 30000);
         },
         tick: () => {
           const artworks = get().artworks;
@@ -87,13 +96,24 @@ const useStore = create<State>()(
           }
         },
         update: (data: any) => {
-          console.log("updating artsworks", data);
           data.forEach((item: any) => {
             // artwork
-            if(item?.image){
-              const artworks = [...get().artworks]
+            if (item?.image) {
+              console.log("updating artsworks", data);
+              const artworks = [...get().artworks];
               artworks.push(item);
               set({ artworks });
+            }
+            // settings
+            if (item?.slideTime) {
+              const slideTime = parseInt(item?.slideTime);
+              set({ slideTime: slideTime });
+              clearInterval(intervalId);
+              console.log("updating slideTime", slideTime);
+              setInterval(() => {
+                get().tick();
+              }, slideTime);
+              console.log("updated slide time")
             }
           });
         },
